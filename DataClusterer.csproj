@@ -71,8 +71,10 @@
     </Compile>
     <Compile Include="ClusteringMethod.cs" />
     <Compile Include="ClusterizationResult.cs" />
+    <Compile Include="CMeans.cs" />
     <Compile Include="EuclideanDistance.cs" />
     <Compile Include="KMeans.cs" />
+    <Compile Include="KMeansPlusPlus.cs" />
     <Compile Include="MeasureSimilarity.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -31,15 +31,18 @@ namespace DataClusterer
             {
                 new double[] { 2, 2 },
                 new double[] { 1, 2 },
+                new double[] { 3, 3 },
                 new double[] { 1, 3 },
                 new double[] { 3, 2 },
                 new double[] { 4, 5 },
                 new double[] { 4, 4 },
                 new double[] { 5, 5 },
-                new double[] { 6, 5 }
+                new double[] { 6, 5 },
 
             };
             KMeans<double> kMeans = new KMeans<double>(2, new EuclideanDistance());
+
+            kMeans = new KMeansPlusPlus<double>(2, new EuclideanDistance());
             ClusterizationResult<double> result = kMeans.ExecuteClusterization(data);
             chart.Series = FillSeriesCollection(result.Clusters);
             chart.LegendLocation = LegendLocation.Left;
@@ -82,7 +85,7 @@ namespace DataClusterer
 
         public Brush GetRandomBrush() 
         {
-            Brush result = Brushes.Transparent;
+            Brush result = null;
             
             Random rnd = new Random();
             Type brushesType = typeof(Brushes);
