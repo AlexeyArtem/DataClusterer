@@ -24,9 +24,11 @@ namespace DataClusterer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Random _rand;
         public MainWindow()
         {
             InitializeComponent();
+            _rand = new Random();
             List<double[]> data = new List<double[]>()
             {
                 new double[] { 2, 2 },
@@ -40,10 +42,11 @@ namespace DataClusterer
                 new double[] { 6, 5 },
 
             };
-            KMeans<double> kMeans = new KMeans<double>(2, new EuclideanDistance());
+            KMeans<double> method = new KMeans<double>(2, new EuclideanDistance());
 
-            kMeans = new KMeansPlusPlus<double>(2, new EuclideanDistance());
-            ClusterizationResult<double> result = kMeans.ExecuteClusterization(data);
+            method = new KMeansPlusPlus<double>(2, new EuclideanDistance());
+            method = new CMeans<double>(2, new EuclideanDistance());
+            ClusterizationResult<double> result = method.ExecuteClusterization(data);
             chart.Series = FillSeriesCollection(result.Clusters);
             chart.LegendLocation = LegendLocation.Left;
         }
@@ -85,13 +88,12 @@ namespace DataClusterer
 
         public Brush GetRandomBrush() 
         {
-            Brush result = null;
-            
-            Random rnd = new Random();
+            Brush result = Brushes.Transparent;
+
             Type brushesType = typeof(Brushes);
             PropertyInfo[] properties = brushesType.GetProperties();
 
-            int random = rnd.Next(properties.Length);
+            int random = _rand.Next(properties.Length);
             result = (Brush)properties[random].GetValue(null, null);
 
             return result;
