@@ -4,9 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:wpfTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         xmlns:local="clr-namespace:DataClusterer"
         mc:Ignorable="d"
-        Title="Data clusterer" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Data clusterer" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+    <Window.Resources>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -14,7 +17,17 @@
         </Grid.ColumnDefinitions>
         <lvc:CartesianChart Grid.Column="0" Name="chart" LegendLocation="Bottom"></lvc:CartesianChart>
         <StackPanel Orientation="Vertical" Grid.Column="1">
+            <Label>Файл данных:</Label>
+            <TextBox IsReadOnly="True" IsEnabled="False" Name="tbNameFile"></TextBox>
             <Button x:Name="btSelectionFile" Click="btSelectionFile_Click">Выбрать файл</Button>
+            <Label>Метод кластеризации:</Label>
+            <ComboBox x:Name="cbMethodSelection" SelectedIndex="0"></ComboBox>
+            <Label>Количество кластеров:</Label>
+            <wpfTool:IntegerUpDown x:Name="udAmountClusters" Maximum="100" Minimum="2" Value="3"></wpfTool:IntegerUpDown>
+            <Label>Мера сходства:</Label>
+            <ComboBox x:Name="cbMeasureSelection" SelectedIndex="0"></ComboBox>
+            <Button x:Name="btExecuteClusterization" Click="btExecuteClusterization_Click">Выполнить кластеризацию</Button>
+            <Button x:Name="btRefreshColor" Click="btRefreshColor_Click">Обновить цвета кластеров</Button>
         </StackPanel>
     </Grid>
 </Window>
