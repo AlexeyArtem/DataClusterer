@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    abstract class ClusteringMethod<T>where T : struct
+    abstract class ClusteringMethod
     {
-        public abstract ClusterizationResult<T> ExecuteClusterization(IList<T[]> data);
-        
-        public virtual IList<T[]> NormalizeData(IList<T[]> data) 
-        {
-            return null;
-        }
+        public abstract ClusterizationResult ExecuteClusterization(IList<double[]> data);
     }
 }

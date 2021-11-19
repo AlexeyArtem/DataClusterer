@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class KMeans<T> : ClusteringMethod<T> where T : struct
+    class KMeans : ClusteringMethod
     {
         protected static Random _random = new Random();
         protected int _amountClusters;
-        protected MeasureSimilarity<T> _measureSimilarity;
-        protected Dictionary<T[], IList<T[]>> _clusters;
+        protected MeasureSimilarity _measureSimilarity;
+        protected Dictionary<double[], IList<double[]>> _clusters;
 
 
-        public KMeans(int amountClusters, MeasureSimilarity<T> measureSimilarity)
+        public KMeans(int amountClusters, MeasureSimilarity measureSimilarity)
         {
-            if (amountClusters <= 0) throw new ArgumentException("Amount clusters must be bigger than zero");
+            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
             _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
             _amountClusters = amountClusters;
         }
@@ -34,31 +34,31 @@ namespace DataClusterer
         }
 
         //Начальная инициализация центров масс (центроидов) случайным образом
-        protected virtual void InitializeCentroids(IList<T[]> data) 
+        protected virtual void InitializeCentroids(IList<double[]> data) 
         {
             if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");
 
-            _clusters = new Dictionary<T[], IList<T[]>>();
+            _clusters = new Dictionary<double[], IList<double[]>>();
             while (_clusters.Count != _amountClusters)
             {
                 int randIndex = _random.Next(0, data.Count);
 
-                T[] vector = data[randIndex];
+                double[] vector = data[randIndex];
                 if (!_clusters.ContainsKey(vector))
                 {
-                    _clusters.Add(vector, new List<T[]>());
+                    _clusters.Add(vector, new List<double[]>());
                 }
             }
         }
 
-        public override ClusterizationResult<T> ExecuteClusterization(IList<T[]> data)
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
         {
             InitializeCentroids(data);
 
             bool isCentroidsChange = true;
             while (isCentroidsChange) 
             {
-                List<T[]> centroids = _clusters.Keys.ToList();
+                List<double[]> centroids = _clusters.Keys.ToList();
                 //1. Распределение последовательностей (векторов) данных по кластерам
                 for (int i = 0; i < data.Count; i++)
                 {
@@ -66,13 +66,13 @@ namespace DataClusterer
                 }
 
                 //2. Перерасчет центров масс кластеров
-                Dictionary<T[], IList<T[]>> newClusters = new Dictionary<T[], IList<T[]>>();
-                foreach (T[] centroid in _clusters.Keys)
+                Dictionary<double[], IList<double[]>> newClusters = new Dictionary<double[], IList<double[]>>();
+                foreach (double[] centroid in _clusters.Keys)
                 {
                     //Вычесление средней последовательности
                     int length = data[0].Length; //Длина одной последовательности данных
                     int count = _clusters[centroid].Count; //Количество последовательностей в кластере
-                    T[] averageCentroid = new T[length];
+                    double[] averageCentroid = new double[length];
                     for (int i = 0; i < length; i++)
                     {
                         dynamic sum = 0;
@@ -86,8 +86,8 @@ namespace DataClusterer
                 }
 
                 //3. Сравнение текущих и новых центров масс
-                List<T[]> currentCentroids = _clusters.Keys.ToList();
-                List<T[]> newCentroids = newClusters.Keys.ToList();
+                List<double[]> currentCentroids = _clusters.Keys.ToList();
+                List<double[]> newCentroids = newClusters.Keys.ToList();
                 isCentroidsChange = false;
                 for (int i = 0; i < currentCentroids.Count; i++)
                 {
@@ -98,7 +98,7 @@ namespace DataClusterer
                         //4. Обновление центров масс в кластерах
                         _clusters.Clear();
                         _clusters = newClusters;
-                        foreach (T[] c in _clusters.Keys)
+                        foreach (double[] c in _clusters.Keys)
                             _clusters[c].Clear();
 
                         break;
@@ -106,7 +106,7 @@ namespace DataClusterer
                 }
             }
 
-            return new ClusterizationResult<T>(_clusters);
+            return new ClusterizationResult(_clusters);
         }
     }
 }

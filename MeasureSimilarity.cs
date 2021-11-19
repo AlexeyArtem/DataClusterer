@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    abstract class MeasureSimilarity<T>
+    abstract class MeasureSimilarity
     {
-        public abstract double Calculate(T[] vector1, T[] vector2);
+        public abstract double Calculate(double[] vector1, double[] vector2);
 
         //Поиск центроида, к которому ближе всего находится вектор
-        public virtual T[] FindCentroid(IList<T[]> centroids, T[] vector)
+        public virtual double[] FindCentroid(IList<double[]> centroids, double[] vector)
         {
             double minMeasure = int.MaxValue;
-            T[] centroid = null;
+            double[] centroid = null;
             foreach (var c in centroids)
             {
                 double measure = Calculate(vector, c);
@@ -27,7 +27,7 @@ namespace DataClusterer
             return centroid;
         }
 
-        protected void CheckVectorsValidity(T[] vector1, T[] vector2)
+        protected void CheckVectorsValidity(double[] vector1, double[] vector2)
         {
             if (vector1.Length != vector2.Length)
                 throw new ArgumentException("The lengths of the vectors are not equal");

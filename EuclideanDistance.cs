@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class EuclideanDistance : MeasureSimilarity<double>
+    class EuclideanDistance : MeasureSimilarity
     {
         public override double Calculate(double[] vector1, double[] vector2)
         {

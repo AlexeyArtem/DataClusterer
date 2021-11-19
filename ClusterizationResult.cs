@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accord.Statistics.Analysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class ClusterizationResult<T> where T: struct
+    class ClusterizationResult
     {
-        public ClusterizationResult(Dictionary<T[], IList<T[]>> clusters)
+        public ClusterizationResult(Dictionary<double[], IList<double[]>> clusters)
         {
             Clusters = clusters;
         }
 
-        public IReadOnlyDictionary<T[], IList<T[]>> Clusters { get; }
+        public IReadOnlyDictionary<double[], IList<double[]>> Clusters { get; }
     }
+
 }

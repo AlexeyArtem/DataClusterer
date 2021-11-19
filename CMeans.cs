@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class CMeans<T> : KMeans<T> where T: struct
+    class CMeans : KMeans
     {
         private const double ACCURACY = 0.01;
-        public CMeans(int amountClusters, MeasureSimilarity<T> measureSimilarity) : base (amountClusters, measureSimilarity) { }
+        public CMeans(int amountClusters, MeasureSimilarity measureSimilarity) : base (amountClusters, measureSimilarity) { }
 
         //Вычисление критерия нечеткой ошибки
-        private double GetE(IList<T[]> data, Dictionary<T[], IList<T[]>> clusters) 
+        private double GetE(IList<double[]> data, Dictionary<double[], IList<double[]>> clusters) 
         {
             double[,] matrixU = GetMatrixU(data, clusters);
-            List<T[]> centroids = clusters.Keys.ToList();
+            List<double[]> centroids = clusters.Keys.ToList();
             double E = 0;
             for (int i = 0; i < data.Count; i++)
             {
@@ -28,13 +28,13 @@ namespace DataClusterer
         }
 
         //Получение матрицы U
-        private double[,] GetMatrixU(IList<T[]> data, Dictionary<T[], IList<T[]>> clusters) 
+        private double[,] GetMatrixU(IList<double[]> data, Dictionary<double[], IList<double[]>> clusters) 
         {
             double[,] matrixU = new double[data.Count, _amountClusters];
             for (int i = 0; i < data.Count; i++)
             {
                 List<double> distance = new List<double>();
-                foreach (T[] c in clusters.Keys)
+                foreach (double[] c in clusters.Keys)
                     distance.Add(_measureSimilarity.Calculate(data[i], c));
 
                 for (int j = 0; j < _amountClusters; j++)
@@ -45,7 +45,7 @@ namespace DataClusterer
             return matrixU;
         }
 
-        public override ClusterizationResult<T> ExecuteClusterization(IList<T[]> data)
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
         {
             InitializeCentroids(data);
 
@@ -53,7 +53,7 @@ namespace DataClusterer
             while (currentAccuracy > ACCURACY) 
             {
                 //0. Распеределение векторов по кластерам
-                List<T[]> centroids = _clusters.Keys.ToList();
+                List<double[]> centroids = _clusters.Keys.ToList();
                 for (int i = 0; i < data.Count; i++)
                 {
                     _clusters[_measureSimilarity.FindCentroid(centroids, data[i])].Add(data[i]);
@@ -64,7 +64,7 @@ namespace DataClusterer
                 for (int i = 0; i < data.Count; i++)
                 {
                     List<double> distance = new List<double>();
-                    foreach (T[] c in _clusters.Keys)
+                    foreach (double[] c in _clusters.Keys)
                         distance.Add(_measureSimilarity.Calculate(data[i], c));
 
                     for (int j = 0; j < _amountClusters; j++)
@@ -84,11 +84,11 @@ namespace DataClusterer
                 }
 
                 //3. Перерасчет центров масс кластеров
-                Dictionary<T[], IList<T[]>> newClusters = new Dictionary<T[], IList<T[]>>();
+                Dictionary<double[], IList<double[]>> newClusters = new Dictionary<double[], IList<double[]>>();
                 int length = data[0].Length;
                 for (int k = 0; k < centroids.Count; k++)
                 {
-                    T[] averageCentroid = new T[length];
+                    double[] averageCentroid = new double[length];
                     for (int j = 0; j < length; j++)
                     {
                         dynamic sumVectors = 0;
@@ -112,12 +112,12 @@ namespace DataClusterer
                 {
                     _clusters.Clear();
                     _clusters = newClusters;
-                    foreach (T[] c in _clusters.Keys)
+                    foreach (double[] c in _clusters.Keys)
                         _clusters[c].Clear();
                 }
             }
 
-            return new ClusterizationResult<T>(_clusters);
+            return new ClusterizationResult(_clusters);
         }
     }
 }

@@ -8,6 +8,13 @@
         mc:Ignorable="d"
         Title="Data clusterer" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
-        <lvc:CartesianChart Name="chart"></lvc:CartesianChart>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <lvc:CartesianChart Grid.Column="0" Name="chart" LegendLocation="Bottom"></lvc:CartesianChart>
+        <StackPanel Orientation="Vertical" Grid.Column="1">
+            <Button x:Name="btSelectionFile" Click="btSelectionFile_Click">Выбрать файл</Button>
+        </StackPanel>
     </Grid>
 </Window>
