@@ -119,7 +119,9 @@
     <Compile Include="ClusterizationResult.cs" />
     <Compile Include="CMeans.cs" />
     <Compile Include="DataConverter.cs" />
+    <Compile Include="Edge.cs" />
     <Compile Include="EuclideanDistance.cs" />
+    <Compile Include="Graph.cs" />
     <Compile Include="KMeans.cs" />
     <Compile Include="KMeansPlusPlus.cs" />
     <Compile Include="MeasureSimilarity.cs" />
@@ -129,6 +131,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Node.cs" />
+    <Compile Include="PrimaAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
