@@ -8,38 +8,45 @@ namespace DataClusterer
 {
     class Graph
     {
-        public Graph(IList<double[]> data, MeasureSimilarity measureSimilarity) 
-        {
-            Edges = new List<Edge>();
-            DistanceMatrix = new double?[data.Count, data.Count];
-            for (int i = 0; i < data.Count; i++)
-            {
-                Node firstNode = new Node(data[i]);
-                if (i == data.Count - 1) break;
-                for (int j = i + 1; j < data.Count; j++)
-                {
-                    Node secondNode = new Node(data[j]);
-                    Edges.Add(new Edge(firstNode, secondNode, measureSimilarity.Calculate(data[i], data[j])));
-                }
-
-                for (int j = 0; j < data.Count; j++)
-                {
-                    double? value = null;
-                    if (i != j) 
-                        value = measureSimilarity.Calculate(data[i], data[j]);
-
-                    DistanceMatrix[i, j] = value;
-                }
-            }
-        }
+        private List<Edge> edges;
+        private List<Node> nodes;
 
         public Graph()
         {
-            Edges = new List<Edge>();
-            DistanceMatrix = new double?[0, 0];
+            edges = new List<Edge>();
+            nodes = new List<Node>();
         }
 
-        public List<Edge> Edges { get; }
-        public double?[,] DistanceMatrix { get; }
+        public IReadOnlyCollection<Edge> Edges { get => edges; }
+        public IReadOnlyCollection<Node> Nodes { get => nodes; }
+
+        private void AddNode(Node node)
+        {
+            foreach (Node n in nodes)
+            {
+                if (node.Number == n.Number) return;
+            }
+
+            nodes.Add(node);
+        }
+
+        public void AddEdge(Edge edge) 
+        {
+            foreach (Edge e in edges)
+            {
+                if ((e.FirstNode.Number == edge.FirstNode.Number && e.SecondNode.Number == edge.SecondNode.Number) ||
+                    (e.SecondNode.Number == edge.FirstNode.Number && e.FirstNode.Number == edge.SecondNode.Number))
+                    return;
+            }
+
+            edges.Add(edge);
+            AddNode(edge.FirstNode);
+            AddNode(edge.SecondNode);
+        }
+
+        public void RemoveEdge(Edge edge) 
+        {
+            edges.Remove(edge);
+        }
     }
 }

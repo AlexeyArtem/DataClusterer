@@ -34,44 +34,64 @@ namespace DataClusterer
 
         public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
         {
-            Graph graph = new Graph(data, _measureSimilarity);
-            double?[,] distanceMatrix = graph.DistanceMatrix;
+            double?[][] distanceMatrix = new double?[data.Count][];
+            for (int i = 0; i < data.Count; i++)
+            {
+                for (int j = 0; j < data.Count; j++)
+                {
+                    double? value = null;
+                    if (i != j)
+                        value = _measureSimilarity.Calculate(data[i], data[j]);
+
+                    distanceMatrix[i][j] = value;
+                }
+            }
             int randIndex = _rand.Next(0, distanceMatrix.GetLength(0));
 
-            double?[,] resultMatrix = new double?[distanceMatrix.GetLength(0), distanceMatrix.GetLength(1)];
-            for (int i = 0; i < resultMatrix.GetLength(0); i++)
-            {
-                for (int j = 0; j < resultMatrix.GetLength(1); j++)
-                {
-                    resultMatrix[i, j] = null;
-                }
-            }
+            Graph graph = new Graph();
+            graph.AddEdge(new Edge(null, new Node(randIndex), 0));
 
-            List<int?> usesIndexes = new List<int?>();
-            usesIndexes.Add(randIndex);
-            
-            while (usesIndexes.Count != distanceMatrix.GetLength(0)) 
+            while (graph.Nodes.Count != distanceMatrix.GetLength(0)) 
             {
-                foreach (int i in usesIndexes) 
+                //Поиск следующего наименьшего расстояния
+                double? minDistance = int.MaxValue;
+                Node node = null;
+                foreach (Node n in graph.Nodes) 
                 {
-                }
-            }
-
-            for (int i = 0; i < distanceMatrix.GetLength(1); i++)
-            {
-                double? minValue = int.MaxValue;
-                int? index = null;
-                if (distanceMatrix[randIndex, i] < minValue && distanceMatrix[randIndex, i] != null && !usesIndexes.Contains(i)) 
-                {
-                    minValue = distanceMatrix[randIndex, i];
-                    index = i;
+                    double? value = distanceMatrix[n.Number].Min();
+                    if (value < minDistance) 
+                    {
+                        minDistance = value;
+                        node = n;
+                    }
                 }
 
-                if (index != null) 
-                {
-                    usesIndexes.Add(index);
-                }
+                //Исключение найденного значения из матрицы расстояний
+                int minDistanceIndex = Array.IndexOf(distanceMatrix[node.Number], minDistance);
+                distanceMatrix[node.Number][minDistanceIndex] = null;
+                distanceMatrix[minDistanceIndex][node.Number] = null;
+
+                //Добавление нового ребра
+                graph.AddEdge(new Edge(node, new Node(minDistanceIndex), (double)minDistance));
             }
+
+            //Удаление ребер с наибольшими расстояними
+            int k = 0;
+            while (k != _amountClusters - 1) 
+            {
+                Edge edge = graph.Edges.First();
+                foreach (Edge e in graph.Edges)
+                {
+                    if (edge.Weight < e.Weight)
+                        edge = e;
+                }
+                graph.RemoveEdge(edge);
+
+                k++;
+            }
+
+            //Распределение данных по кластерам
+
 
             return null;
         }
