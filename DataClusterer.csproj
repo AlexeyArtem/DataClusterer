@@ -124,6 +124,7 @@
     <Compile Include="Graph.cs" />
     <Compile Include="KMeans.cs" />
     <Compile Include="KMeansPlusPlus.cs" />
+    <Compile Include="KraskalaAlgorithm.cs" />
     <Compile Include="MeasureSimilarity.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
