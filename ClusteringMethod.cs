@@ -8,6 +8,23 @@ namespace DataClusterer
 {
     abstract class ClusteringMethod
     {
-        public abstract ClusterizationResult ExecuteClusterization(IList<double[]> data);
+        protected MeasureSimilarity _measureSimilarity;
+
+        public ClusteringMethod(MeasureSimilarity measureSimilarity) 
+        {
+            if (measureSimilarity == null) throw new ArgumentNullException("Measure similarity is null");
+            _measureSimilarity = measureSimilarity;
+        }
+
+        protected virtual void CheckData(IList<double[]> data, int amountClusters) 
+        {
+            if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");
+            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
+            if (amountClusters > data.Count) throw new ArgumentException("Amount clusters is greater than the amount data vectors");
+
+        }
+
+        public abstract ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters);
+
     }
 }

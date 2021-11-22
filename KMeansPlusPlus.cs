@@ -8,9 +8,9 @@ namespace DataClusterer
 {
     class KMeansPlusPlus : KMeans
     {
-        public KMeansPlusPlus(int amountClusters, MeasureSimilarity measureSimilarity) : base(amountClusters, measureSimilarity) { }
+        public KMeansPlusPlus(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
-        protected override void InitializeCentroids(IList<double[]> data)
+        protected override void InitializeCentroids(IList<double[]> data, int amountClusters)
         {
             if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");
 
@@ -19,7 +19,7 @@ namespace DataClusterer
             var randIndex = _random.Next(0, data.Count);
             _clusters.Add(data[randIndex], new List<double[]>());
 
-            while (_clusters.Count != _amountClusters) 
+            while (_clusters.Count != amountClusters) 
             {
                 //2. Нахождение для каждого вектора расстояния до ближайшего центроида (из тех, которые уже выбраны)
                 Dictionary<double[], double> distances = new Dictionary<double[], double>();

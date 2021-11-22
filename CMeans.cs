@@ -9,7 +9,7 @@ namespace DataClusterer
     class CMeans : KMeans
     {
         private const double ACCURACY = 0.01;
-        public CMeans(int amountClusters, MeasureSimilarity measureSimilarity) : base (amountClusters, measureSimilarity) { }
+        public CMeans(MeasureSimilarity measureSimilarity) : base (measureSimilarity) { }
 
         //Вычисление критерия нечеткой ошибки
         private double GetE(IList<double[]> data, Dictionary<double[], IList<double[]>> clusters) 
@@ -19,7 +19,7 @@ namespace DataClusterer
             double E = 0;
             for (int i = 0; i < data.Count; i++)
             {
-                for (int k = 0; k < _amountClusters; k++)
+                for (int k = 0; k < clusters.Count; k++)
                 {
                     E += matrixU[i, k] * Math.Pow(_measureSimilarity.Calculate(data[i], centroids[k]), 2);
                 }
@@ -30,14 +30,14 @@ namespace DataClusterer
         //Получение матрицы U
         private double[,] GetMatrixU(IList<double[]> data, Dictionary<double[], IList<double[]>> clusters) 
         {
-            double[,] matrixU = new double[data.Count, _amountClusters];
+            double[,] matrixU = new double[data.Count, clusters.Count];
             for (int i = 0; i < data.Count; i++)
             {
                 List<double> distance = new List<double>();
                 foreach (double[] c in clusters.Keys)
                     distance.Add(_measureSimilarity.Calculate(data[i], c));
 
-                for (int j = 0; j < _amountClusters; j++)
+                for (int j = 0; j < clusters.Count; j++)
                 {
                     matrixU[i, j] = 1 - distance[j] / distance.Sum();
                 }
@@ -45,9 +45,10 @@ namespace DataClusterer
             return matrixU;
         }
 
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
-            InitializeCentroids(data);
+            CheckData(data, amountClusters);
+            InitializeCentroids(data, amountClusters);
 
             double currentAccuracy = int.MaxValue;
             while (currentAccuracy > ACCURACY) 
@@ -60,14 +61,14 @@ namespace DataClusterer
                 }
 
                 //1. Заполнение матрицы U
-                double[,] matrixU = new double[data.Count, _amountClusters];
+                double[,] matrixU = new double[data.Count, amountClusters];
                 for (int i = 0; i < data.Count; i++)
                 {
                     List<double> distance = new List<double>();
                     foreach (double[] c in _clusters.Keys)
                         distance.Add(_measureSimilarity.Calculate(data[i], c));
 
-                    for (int j = 0; j < _amountClusters; j++)
+                    for (int j = 0; j < amountClusters; j++)
                     {
                         matrixU[i, j] = 1 - distance[j] / distance.Sum();
                     }
@@ -77,7 +78,7 @@ namespace DataClusterer
                 double E = 0;
                 for (int i = 0; i < data.Count; i++)
                 {
-                    for (int k = 0; k < _amountClusters; k++)
+                    for (int k = 0; k < amountClusters; k++)
                     {
                         E += matrixU[i, k] * Math.Pow(_measureSimilarity.Calculate(data[i], centroids[k]), 2);
                     }

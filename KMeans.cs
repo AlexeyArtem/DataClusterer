@@ -9,37 +9,22 @@ namespace DataClusterer
     class KMeans : ClusteringMethod
     {
         protected static Random _random = new Random();
-        protected int _amountClusters;
-        protected MeasureSimilarity _measureSimilarity;
         protected Dictionary<double[], IList<double[]>> _clusters;
 
 
-        public KMeans(int amountClusters, MeasureSimilarity measureSimilarity)
+        public KMeans(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
         {
-            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
             _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
-            _amountClusters = amountClusters;
         }
 
-        public int AmountClusters
-        {
-            get 
-            {
-                return _amountClusters;
-            }
-            set 
-            {
-                _amountClusters = value;
-            }
-        }
 
         //Начальная инициализация центров масс (центроидов) случайным образом
-        protected virtual void InitializeCentroids(IList<double[]> data) 
+        protected virtual void InitializeCentroids(IList<double[]> data, int amountClusters) 
         {
             if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");
 
             _clusters = new Dictionary<double[], IList<double[]>>();
-            while (_clusters.Count != _amountClusters)
+            while (_clusters.Count != amountClusters)
             {
                 int randIndex = _random.Next(0, data.Count);
 
@@ -51,9 +36,19 @@ namespace DataClusterer
             }
         }
 
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
+
+        public virtual ClusterizationResult ExecuteClusterization(IList<double[]> data) 
         {
-            InitializeCentroids(data);
+            if (data.Count <= 1) throw new ArgumentException();
+
+            return null;
+        }
+
+
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
+        {
+            CheckData(data, amountClusters);
+            InitializeCentroids(data, amountClusters);
 
             bool isCentroidsChange = true;
             while (isCentroidsChange) 

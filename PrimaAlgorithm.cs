@@ -8,32 +8,17 @@ namespace DataClusterer
 {
     class PrimaAlgorithm : ClusteringMethod
     {
-        private int _amountClusters;
-        private MeasureSimilarity _measureSimilarity;
         private Random _rand;
 
-        public PrimaAlgorithm(int amountClusters, MeasureSimilarity measureSimilarity) 
+        public PrimaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
         {
-            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
             _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
-            _amountClusters = amountClusters;
-            _rand = new Random();
         }
 
-        public int AmountClusters
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
-            get
-            {
-                return _amountClusters;
-            }
-            set
-            {
-                _amountClusters = value;
-            }
-        }
+            CheckData(data, amountClusters);
 
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
-        {
             double?[][] distanceMatrix = new double?[data.Count][];
             for (int i = 0; i < data.Count; i++)
             {
@@ -77,7 +62,7 @@ namespace DataClusterer
 
             //Удаление ребер с наибольшими расстояними
             int k = 0;
-            while (k != _amountClusters - 1) 
+            while (k != amountClusters - 1) 
             {
                 Edge edge = graph.Edges.First();
                 foreach (Edge e in graph.Edges)
