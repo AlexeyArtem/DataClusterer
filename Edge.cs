@@ -10,6 +10,7 @@ namespace DataClusterer
     {
         public Edge(Node firstNode, Node secondNode, double weight)
         {
+            if (firstNode == null || secondNode == null) throw new ArgumentNullException("Node is null");
             FirstNode = firstNode;
             SecondNode = secondNode;
             Weight = weight;

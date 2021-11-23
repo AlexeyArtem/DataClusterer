@@ -9,11 +9,13 @@ namespace DataClusterer
     abstract class ClusteringMethod
     {
         protected MeasureSimilarity _measureSimilarity;
+        protected Random _rand;
 
         public ClusteringMethod(MeasureSimilarity measureSimilarity) 
         {
             if (measureSimilarity == null) throw new ArgumentNullException("Measure similarity is null");
             _measureSimilarity = measureSimilarity;
+            _rand = new Random();
         }
 
         protected virtual void CheckData(IList<double[]> data, int amountClusters) 

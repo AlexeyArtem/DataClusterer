@@ -8,20 +8,17 @@ namespace DataClusterer
 {
     class PrimaAlgorithm : ClusteringMethod
     {
-        private Random _rand;
-
-        public PrimaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
-        {
-            _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
-        }
+        public PrimaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
         public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
             CheckData(data, amountClusters);
 
             double?[][] distanceMatrix = new double?[data.Count][];
+            
             for (int i = 0; i < data.Count; i++)
             {
+                distanceMatrix[i] = new double?[data.Count];
                 for (int j = 0; j < data.Count; j++)
                 {
                     double? value = null;
@@ -31,11 +28,13 @@ namespace DataClusterer
                     distanceMatrix[i][j] = value;
                 }
             }
-            int randIndex = _rand.Next(0, distanceMatrix.GetLength(0));
+            //int randIndex = _rand.Next(0, distanceMatrix.GetLength(0));
+            int randIndex = 0;
 
             Graph graph = new Graph();
-            graph.AddEdge(new Edge(null, new Node(randIndex), 0));
+            graph.AddEdge(new Edge(new Node(randIndex, data[randIndex]), new Node(randIndex, data[randIndex]), 0));
 
+            int temp = 0;
             while (graph.Nodes.Count != distanceMatrix.GetLength(0)) 
             {
                 //Поиск следующего наименьшего расстояния
@@ -57,28 +56,33 @@ namespace DataClusterer
                 distanceMatrix[minDistanceIndex][node.Number] = null;
 
                 //Добавление нового ребра
-                graph.AddEdge(new Edge(node, new Node(minDistanceIndex), (double)minDistance));
+                graph.AddEdge(new Edge(node, new Node(minDistanceIndex, data[minDistanceIndex]), (double)minDistance));
+                temp++;
             }
+
+            //Удаление первого нулевого ребра
+            graph.RemoveEdge(graph.Edges.First());
 
             //Удаление ребер с наибольшими расстояними
             int k = 0;
             while (k != amountClusters - 1) 
             {
-                Edge edge = graph.Edges.First();
+                Edge maxEdge = null;
+                double maxWeight = double.MinValue;
                 foreach (Edge e in graph.Edges)
                 {
-                    if (edge.Weight < e.Weight)
-                        edge = e;
+                    if (maxWeight < e.Weight) 
+                    {
+                        maxEdge = e;
+                        maxWeight = e.Weight;
+                    }
                 }
-                graph.RemoveEdge(edge);
+                graph.RemoveEdge(maxEdge);
 
                 k++;
             }
 
-            //Распределение данных по кластерам
-
-
-            return null;
+            return new ClusterizationResult(graph);
         }
     }
 }

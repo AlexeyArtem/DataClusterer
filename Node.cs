@@ -8,11 +8,13 @@ namespace DataClusterer
 {
     class Node
     {
-        public Node(int number)
+        public Node(int number, double[] data)
         {
             Number = number;
+            Data = data;
         }
 
         public int Number { get; }
+        public double[] Data { get; }
     }
 }

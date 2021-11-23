@@ -22,6 +22,8 @@ namespace DataClusterer
 
         private void AddNode(Node node)
         {
+            if (node == null) return;
+
             foreach (Node n in nodes)
             {
                 if (node.Number == n.Number) return;
@@ -32,6 +34,8 @@ namespace DataClusterer
 
         public void AddEdge(Edge edge) 
         {
+            if (edge == null) return;
+
             foreach (Edge e in edges)
             {
                 if ((e.FirstNode.Number == edge.FirstNode.Number && e.SecondNode.Number == edge.SecondNode.Number) ||
@@ -46,6 +50,7 @@ namespace DataClusterer
 
         public void RemoveEdge(Edge edge) 
         {
+            if (edge == null) return;
             edges.Remove(edge);
         }
     }

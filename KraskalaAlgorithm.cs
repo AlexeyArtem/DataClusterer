@@ -8,12 +8,7 @@ namespace DataClusterer
 {
     class KraskalaAlgorithm : ClusteringMethod
     {
-        private MeasureSimilarity _measureSimilarity;
-
-        public KraskalaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
-        {
-            _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
-        }
+        public KraskalaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
         public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {

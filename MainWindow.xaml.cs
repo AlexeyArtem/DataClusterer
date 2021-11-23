@@ -26,7 +26,8 @@ namespace DataClusterer
     {
         KMeans,
         KMeansPlusPlus,
-        CMeans
+        CMeans,
+        PrimaAlgorithm
     }
 
     enum TypeMeasure 
@@ -37,14 +38,12 @@ namespace DataClusterer
     public partial class MainWindow : Window
     {
         private Random _rand;
-        private KMeans _clusteringMethod;
         private List<double[]> _data;
 
         public MainWindow()
         {
             InitializeComponent();
             _rand = new Random();
-            _clusteringMethod = new KMeans(new EuclideanDistance());
             cbMethodSelection.ItemsSource = Enum.GetValues(typeof(TypeMethod)).Cast<TypeMethod>();
             cbMeasureSelection.ItemsSource = Enum.GetValues(typeof(TypeMeasure)).Cast<TypeMeasure>();
         }
@@ -63,7 +62,7 @@ namespace DataClusterer
 
             nameFile = ofd.SafeFileName;
 
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false };
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture) { DetectColumnCountChanges = true, HasHeaderRecord = false };
             List<double[]> data = new List<double[]>();
             using (var csv = new CsvReader(new StreamReader(ofd.OpenFile()), config))
             {
@@ -71,8 +70,9 @@ namespace DataClusterer
                 while (csv.Read())
                 {
                     List<double> values = new List<double>();
-                    for (int i = 0; csv.TryGetField(i, out double value); i++)
+                    for (int i = 0; i < csv.ColumnCount; i++)
                     {
+                        csv.TryGetField(i, out double value);
                         values.Add(value);
                     }
                     data.Add(values.ToArray());
@@ -117,6 +117,31 @@ namespace DataClusterer
             return series;
         }
 
+        private SeriesCollection FillSeriesCollection(Graph clustersGraph) 
+        {
+            SeriesCollection series = new SeriesCollection();
+            Brush brushPoint = Brushes.Azure;
+            Brush brushLine = Brushes.CadetBlue;
+            foreach (Edge e in clustersGraph.Edges) 
+            {
+                LineSeries line = new LineSeries()
+                {
+                    Values = new ChartValues<ObservablePoint>()
+                    {
+                        new ObservablePoint(e.FirstNode.Data[0], e.FirstNode.Data[1]),
+                        new ObservablePoint(e.SecondNode.Data[0], e.SecondNode.Data[1])
+                    }
+                };
+                line.PointForeground = brushPoint;
+                line.Stroke = brushLine;
+                line.Fill = Brushes.Transparent;
+                
+                series.Add(line);
+            }
+
+            return series;
+        }
+
         private Brush GetRandomBrush() 
         {
             Type brushesType = typeof(Brushes);
@@ -128,9 +153,10 @@ namespace DataClusterer
             return result;
         }
 
-        private void SetClusteringMethod() 
+        private ClusteringMethod GetClusteringMethod() 
         {
             MeasureSimilarity measureSimilarity;
+            ClusteringMethod clusteringMethod;
 
             Enum.TryParse(cbMeasureSelection.SelectedItem.ToString(), out TypeMeasure typeMeasure);
             switch (typeMeasure) 
@@ -144,19 +170,26 @@ namespace DataClusterer
             }
 
             Enum.TryParse(cbMethodSelection.SelectedItem.ToString(), out TypeMethod typeMethod);
-            int amountClusters = (int)udAmountClusters.Value;
             switch (typeMethod)
             {
                 case TypeMethod.KMeans:
-                    _clusteringMethod = new KMeans(measureSimilarity);
+                    clusteringMethod = new KMeans(measureSimilarity);
                     break;
                 case TypeMethod.CMeans:
-                    _clusteringMethod = new CMeans(measureSimilarity);
+                    clusteringMethod = new CMeans(measureSimilarity);
                     break;
                 case TypeMethod.KMeansPlusPlus:
-                    _clusteringMethod = new KMeansPlusPlus(measureSimilarity);
+                    clusteringMethod = new KMeansPlusPlus(measureSimilarity);
+                    break;
+                case TypeMethod.PrimaAlgorithm:
+                    clusteringMethod = new PrimaAlgorithm(measureSimilarity);
+                    break;
+                default:
+                    clusteringMethod = new KMeans(measureSimilarity);
                     break;
             }
+
+            return clusteringMethod;
         }
 
         private void btSelectionFile_Click(object sender, RoutedEventArgs e)
@@ -173,10 +206,26 @@ namespace DataClusterer
                 return;
             }
 
-            SetClusteringMethod();
+            ClusteringMethod clusteringMethod = GetClusteringMethod();
+            var result = clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2), (int)udAmountClusters.Value);
 
-            var result = _clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2));
-            chart.Series = FillSeriesCollection(result.Clusters);
+            List<double[]> data = new List<double[]>()
+            {
+                new double[] {1, 1},
+                new double[] {1, 3},
+                new double[] {3, 1},
+                new double[] {5, 6},
+                new double[] {5, 8},
+                new double[] {7, 8},
+                new double[] {8, 2},
+                new double[] {8, 4},
+                new double[] {10, 2}
+            };
+
+            //var result = clusteringMethod.ExecuteClusterization(data, 3);
+
+            if (result.Clusters == null) chart.Series = FillSeriesCollection(result.ClustersGraph);
+            else chart.Series = FillSeriesCollection(result.Clusters);
         }
 
         private void btRefreshColor_Click(object sender, RoutedEventArgs e)
