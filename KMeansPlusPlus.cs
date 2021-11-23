@@ -10,6 +10,7 @@ namespace DataClusterer
     {
         public KMeansPlusPlus(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
+
         protected override void InitializeCentroids(IList<double[]> data, int amountClusters)
         {
             if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");

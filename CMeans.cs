@@ -8,7 +8,7 @@ namespace DataClusterer
 {
     class CMeans : KMeans
     {
-        private const double ACCURACY = 0.01;
+
         public CMeans(MeasureSimilarity measureSimilarity) : base (measureSimilarity) { }
 
         //Вычисление критерия нечеткой ошибки

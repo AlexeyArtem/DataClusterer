@@ -10,6 +10,7 @@ namespace DataClusterer
     {
         protected static Random _random = new Random();
         protected Dictionary<double[], IList<double[]>> _clusters;
+        protected const double ACCURACY = 0.01;
 
 
         public KMeans(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
@@ -41,7 +42,38 @@ namespace DataClusterer
         {
             if (data.Count <= 1) throw new ArgumentException();
 
-            return null;
+            double accuracy = 0.1;
+            int amountClusters = 1;
+
+            ClusterizationResult clusterizationResult = ExecuteClusterization(data, amountClusters); ;
+            
+            double previousSum = int.MaxValue;
+            double temp = previousSum;
+            double currentSum = 0;
+            foreach (var centroid in clusterizationResult.Clusters.Keys)
+            {
+                foreach (var vector in clusterizationResult.Clusters[centroid])
+                {
+                    currentSum += _measureSimilarity.Calculate(vector, centroid);
+                }
+            }
+
+            while (previousSum - currentSum > accuracy)
+            {
+                amountClusters++;
+                previousSum = currentSum; 
+                currentSum = 0;
+                clusterizationResult = ExecuteClusterization(data, amountClusters);
+                foreach(var centroid in clusterizationResult.Clusters.Keys)
+                {
+                    foreach (var vector in clusterizationResult.Clusters[centroid])
+                    {
+                        currentSum += _measureSimilarity.Calculate(vector, centroid);
+                    }
+                }
+            }
+
+            return ExecuteClusterization(data, amountClusters - 1);
         }
 
 

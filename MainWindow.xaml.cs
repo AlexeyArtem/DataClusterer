@@ -37,14 +37,14 @@ namespace DataClusterer
     public partial class MainWindow : Window
     {
         private Random _rand;
-        private ClusteringMethod _clusteringMethod;
+        private KMeans _clusteringMethod;
         private List<double[]> _data;
 
         public MainWindow()
         {
             InitializeComponent();
             _rand = new Random();
-            _clusteringMethod = new KMeansPlusPlus(3, new EuclideanDistance());
+            _clusteringMethod = new KMeans(new EuclideanDistance());
             cbMethodSelection.ItemsSource = Enum.GetValues(typeof(TypeMethod)).Cast<TypeMethod>();
             cbMeasureSelection.ItemsSource = Enum.GetValues(typeof(TypeMeasure)).Cast<TypeMeasure>();
         }
@@ -148,13 +148,13 @@ namespace DataClusterer
             switch (typeMethod)
             {
                 case TypeMethod.KMeans:
-                    _clusteringMethod = new KMeans(amountClusters, measureSimilarity);
+                    _clusteringMethod = new KMeans(measureSimilarity);
                     break;
                 case TypeMethod.CMeans:
-                    _clusteringMethod = new CMeans(amountClusters, measureSimilarity);
+                    _clusteringMethod = new CMeans(measureSimilarity);
                     break;
                 case TypeMethod.KMeansPlusPlus:
-                    _clusteringMethod = new KMeansPlusPlus(amountClusters, measureSimilarity);
+                    _clusteringMethod = new KMeansPlusPlus(measureSimilarity);
                     break;
             }
         }
@@ -174,6 +174,7 @@ namespace DataClusterer
             }
 
             SetClusteringMethod();
+
             var result = _clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2));
             chart.Series = FillSeriesCollection(result.Clusters);
         }

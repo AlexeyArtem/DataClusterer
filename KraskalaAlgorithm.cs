@@ -8,29 +8,14 @@ namespace DataClusterer
 {
     class KraskalaAlgorithm : ClusteringMethod
     {
-        private int _amountClusters;
         private MeasureSimilarity _measureSimilarity;
 
-        public KraskalaAlgorithm(int amountClusters, MeasureSimilarity measureSimilarity)
+        public KraskalaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity)
         {
-            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
             _measureSimilarity = measureSimilarity ?? throw new ArgumentException("Measure similarity is null");
-            _amountClusters = amountClusters;
         }
 
-        public int AmountClusters
-        {
-            get
-            {
-                return _amountClusters;
-            }
-            set
-            {
-                _amountClusters = value;
-            }
-        }
-
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data)
+        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
             double?[][] distanceMatrix = new double?[data.Count][];
             for (int i = 0; i < data.Count; i++)

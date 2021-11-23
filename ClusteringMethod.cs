@@ -19,7 +19,7 @@ namespace DataClusterer
         protected virtual void CheckData(IList<double[]> data, int amountClusters) 
         {
             if (data.Count < 2) throw new ArgumentException("The number of vectors for clustering must be greater than 1");
-            if (amountClusters <= 1) throw new ArgumentException("Amount clusters must be bigger than 1");
+            if (amountClusters < 1) throw new ArgumentException("Amount clusters must be bigger than 0");
             if (amountClusters > data.Count) throw new ArgumentException("Amount clusters is greater than the amount data vectors");
 
         }
