@@ -42,7 +42,7 @@ namespace DataClusterer
         {
             if (data.Count <= 1) throw new ArgumentException();
 
-            double accuracy = 0.1;
+            double accuracy = 1;
             int amountClusters = 1;
 
             ClusterizationResult clusterizationResult = ExecuteClusterization(data, amountClusters); ;
@@ -54,7 +54,7 @@ namespace DataClusterer
             {
                 foreach (var vector in clusterizationResult.Clusters[centroid])
                 {
-                    currentSum += _measureSimilarity.Calculate(vector, centroid);
+                    currentSum += Math.Pow(_measureSimilarity.Calculate(vector, centroid), 2);
                 }
             }
 
@@ -68,7 +68,7 @@ namespace DataClusterer
                 {
                     foreach (var vector in clusterizationResult.Clusters[centroid])
                     {
-                        currentSum += _measureSimilarity.Calculate(vector, centroid);
+                        currentSum += Math.Pow(_measureSimilarity.Calculate(vector, centroid), 2);
                     }
                 }
             }

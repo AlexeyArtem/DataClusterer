@@ -15,7 +15,7 @@
             <ColumnDefinition Width="3*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <lvc:CartesianChart Grid.Column="0" Name="chart" LegendLocation="None"></lvc:CartesianChart>
+        <lvc:CartesianChart Grid.Column="0" Name="chart" LegendLocation="Bottom"></lvc:CartesianChart>
         <StackPanel Orientation="Vertical" Grid.Column="1">
             <Label>Файл данных:</Label>
             <TextBox IsReadOnly="True" IsEnabled="False" Name="tbNameFile"></TextBox>
@@ -27,6 +27,7 @@
             <Label>Мера сходства:</Label>
             <ComboBox x:Name="cbMeasureSelection" SelectedIndex="0"></ComboBox>
             <Button x:Name="btExecuteClusterization" Click="btExecuteClusterization_Click">Выполнить кластеризацию</Button>
+            <Button x:Name="btExecuteAutoClusterization" Click="btExecuteAutoClusterization_Click">Выполнить автокластеризацию</Button>
             <Button x:Name="btRefreshColor" Click="btRefreshColor_Click">Обновить цвета кластеров</Button>
         </StackPanel>
     </Grid>

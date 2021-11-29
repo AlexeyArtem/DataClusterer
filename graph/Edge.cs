@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class Edge
+    class Edge : IComparable
     {
         public Edge(Node firstNode, Node secondNode, double weight)
         {
@@ -19,5 +19,20 @@ namespace DataClusterer
         public Node FirstNode { get; set; }
         public Node SecondNode { get; set; }
         public double Weight { get; }
+
+        public int CompareTo(object obj)
+        {
+            int position = 0;
+            if (obj is Edge edge)
+            {
+                if (edge.Weight > Weight)
+                    position = -1;
+
+                else if (edge.Weight < Weight)
+                    position = 1;
+            }
+
+            return position;
+        }
     }
 }

@@ -32,7 +32,10 @@ namespace DataClusterer
 
     enum TypeMeasure 
     {
-        EuclideanDistance
+        EuclideanDistance,
+        SquareEuclideDistance,
+        ManhattanDistance,
+        ChebyshevDistance
     }
 
     public partial class MainWindow : Window
@@ -164,6 +167,15 @@ namespace DataClusterer
                 case TypeMeasure.EuclideanDistance:
                     measureSimilarity = new EuclideanDistance();
                     break;
+                case TypeMeasure.SquareEuclideDistance:
+                    measureSimilarity = new SquareEuclideanDistance();
+                    break;
+                case TypeMeasure.ManhattanDistance:
+                    measureSimilarity = new ManhattanDistance();
+                    break;
+                case TypeMeasure.ChebyshevDistance:
+                    measureSimilarity = new ChebyshevDistance();
+                    break;
                 default:
                     measureSimilarity = new EuclideanDistance();
                     break;
@@ -240,6 +252,23 @@ namespace DataClusterer
                     scatter.Fill = GetRandomBrush();
                 }
             }
+        }
+
+        private void btExecuteAutoClusterization_Click(object sender, RoutedEventArgs e)
+        {
+            if (_data == null)
+            {
+                MessageBox.Show("Чтобы выполнить кластеризацию, выберите файл с данными", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            KMeans clusteringMethod = GetClusteringMethod() as KMeans;
+            if (clusteringMethod == null) 
+            {
+                MessageBox.Show("Выполнить автоматическую кластеризацию можно только с помощью векторных методов", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var result = clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2));
+            chart.Series = FillSeriesCollection(result.Clusters);
         }
     }
 }

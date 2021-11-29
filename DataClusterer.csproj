@@ -107,6 +107,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GraphCluster.cs" />
+    <Compile Include="VectorCluster.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -115,25 +117,30 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClusteringMethod.cs" />
+    <Compile Include="IClusterableData.cs" />
+    <Compile Include="GraphKraskala.cs" />
+    <Compile Include="means similarity\ChebyshevDistance.cs" />
+    <Compile Include="methods\ClusteringMethod.cs" />
     <Compile Include="ClusterizationResult.cs" />
-    <Compile Include="CMeans.cs" />
+    <Compile Include="methods\CMeans.cs" />
     <Compile Include="DataConverter.cs" />
-    <Compile Include="Edge.cs" />
-    <Compile Include="EuclideanDistance.cs" />
-    <Compile Include="Graph.cs" />
-    <Compile Include="KMeans.cs" />
-    <Compile Include="KMeansPlusPlus.cs" />
-    <Compile Include="KraskalaAlgorithm.cs" />
-    <Compile Include="MeasureSimilarity.cs" />
+    <Compile Include="graph\Edge.cs" />
+    <Compile Include="means similarity\EuclideanDistance.cs" />
+    <Compile Include="means similarity\ManhattanDistance.cs" />
+    <Compile Include="means similarity\SquareEuclideanDistance.cs" />
+    <Compile Include="graph\Graph.cs" />
+    <Compile Include="methods\KMeans.cs" />
+    <Compile Include="methods\KMeansPlusPlus.cs" />
+    <Compile Include="methods\KraskalaAlgorithm.cs" />
+    <Compile Include="means similarity\MeasureSimilarity.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Node.cs" />
-    <Compile Include="PrimaAlgorithm.cs" />
+    <Compile Include="graph\Node.cs" />
+    <Compile Include="methods\PrimaAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

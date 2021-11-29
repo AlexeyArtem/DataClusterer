@@ -10,7 +10,25 @@ namespace DataClusterer
     {
         public KraskalaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
+        private void FindMinSpanTree(GraphKraskala graph) 
+        {
+            graph.Edges.Sort(); //сортировка ребер в порядке возрастания их веса
+
+            foreach (Edge currentEdge in graph.Edges)
+            {
+                if (graph.Edges.Count == 1) break;
+
+            }
+
+        }
+
         public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
+        {
+
+            return null;
+        }
+
+        public ClusterizationResult ExecuteClusterization(IList<double[]> data)
         {
             double?[][] distanceMatrix = new double?[data.Count][];
             for (int i = 0; i < data.Count; i++)

@@ -23,7 +23,7 @@ namespace DataClusterer
                 {
                     double? value = null;
                     if (i != j)
-                        value = _measureSimilarity.Calculate(data[i], data[j]);
+                        value = Math.Pow(_measureSimilarity.Calculate(data[i], data[j]), 2);
 
                     distanceMatrix[i][j] = value;
                 }
