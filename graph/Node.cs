@@ -14,6 +14,14 @@ namespace DataClusterer
             Data = data;
         }
 
+        public Node(int number, double[] data, GraphCluster cluster)
+        {
+            Number = number;
+            Data = data;
+            Cluster = cluster;
+        }
+
+        public GraphCluster Cluster { get; }
         public int Number { get; }
         public double[] Data { get; }
     }

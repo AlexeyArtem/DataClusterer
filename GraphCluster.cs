@@ -8,7 +8,6 @@ namespace DataClusterer
 {
     class GraphCluster : IClusterableData
     {
-        List<Node> Nodes { get; }
         public IList<double[]> GetClusterData()
         {
             List<double[]> data = new List<double[]>();
@@ -19,5 +18,7 @@ namespace DataClusterer
 
             return data;
         }
+
+        public List<Node> Nodes { get; }
     }
 }
