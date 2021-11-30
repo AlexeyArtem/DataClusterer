@@ -15,14 +15,14 @@ namespace DataClusterer
             ClustersGraph = null;
         }
 
-        public ClusterizationResult(Graph clustersGraph)
+        public ClusterizationResult(GraphClusters clustersGraph)
         {
             ClustersGraph = clustersGraph;
             Clusters = null;
         }
 
         public IReadOnlyDictionary<double[], IList<double[]>> Clusters { get; }
-        public Graph ClustersGraph { get; }
+        public GraphClusters ClustersGraph { get; }
     }
 
 }

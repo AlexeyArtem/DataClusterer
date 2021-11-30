@@ -10,196 +10,96 @@ namespace DataClusterer
     {
         public KraskalaAlgorithm(MeasureSimilarity measureSimilarity) : base(measureSimilarity) { }
 
-        private void FindMinSpanTree(GraphKraskala graph) 
-        {
-            graph.Edges.Sort(); //сортировка ребер в порядке возрастания их веса
-
-            foreach (Edge currentEdge in graph.Edges)
-            {
-                if (graph.Edges.Count == 1) break;
-
-                GraphCluster cluster1 = currentEdge.FirstNode.Cluster;
-                GraphCluster cluster2 = currentEdge.SecondNode.Cluster;
-
-            }
-
-        }
-
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
+        public override IClusterableResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
             CheckData(data, amountClusters);
 
-            double?[][] distanceMatrix = new double?[data.Count][];
+            GraphClusters linkedGraph = new GraphClusters();
             for (int i = 0; i < data.Count; i++)
             {
-                distanceMatrix[i] = new double?[data.Count];
+                Node node1 = new Node(i, data[i]);
                 for (int j = 0; j < data.Count; j++)
                 {
-                    double? value = null;
-                    if (i != j)
-                        value = Math.Pow(_measureSimilarity.Calculate(data[i], data[j]), 2);
-
-                    distanceMatrix[i][j] = value;
+                    double weight = _measureSimilarity.Calculate(data[i], data[j]);
+                    Node node2 = new Node(j, data[j]);
+                    linkedGraph.AddEdge(new Edge(node1, node2, weight));
                 }
             }
+            
+            linkedGraph.Edges.Sort();
+            GraphClusters resultGraph = new GraphClusters();
 
-            Graph graph = new Graph();
-            List<List<Node>> components = new List<List<Node>>();
-            while (components.Count != 1)
+            List<Component> components = new List<Component>();
+            bool isContinue = true;
+            while (isContinue) 
             {
-                //Поиск наименьшего расстояния
-                double? minDistance = double.MaxValue;
-                int row = 0;
-                int column = 0;
-                int[] minDistanceIndexes = new int[2];
-                for (int i = 0; i < distanceMatrix.GetLength(0); i++)
+                Edge edge = linkedGraph.Edges.First();
+
+                var queryFirst = from component in components
+                                 from node in component.Nodes
+                                 where node.Number == edge.FirstNode.Number
+                                 select component;
+                Component componentFirst = queryFirst.FirstOrDefault();
+
+                var querySecond = from component in components
+                                 from node in component.Nodes
+                                 where node.Number == edge.SecondNode.Number
+                                 select component;
+                Component componentSecond = querySecond.FirstOrDefault();
+
+                if (componentFirst == componentSecond) 
                 {
-                    for (int j = 0; j < distanceMatrix.GetLength(1); j++)
+                    if (componentFirst == null && componentSecond == null)
                     {
-                        if (distanceMatrix[i][j] < minDistance)
-                        {
-                            minDistance = distanceMatrix[i][j];
-                            minDistanceIndexes[0] = i;
-                            minDistanceIndexes[1] = j;
-                            row = i;
-                            column = j;
-                        }
+                        components.Add(new Component(new List<Node>() { edge.FirstNode, edge.SecondNode }));
+                        resultGraph.AddEdge(edge);
                     }
                 }
-
-                //Проверка на содержание ребра в том же компоненте
-                Node node1 = new Node(row, data[row]);
-                Node node2 = new Node(column, data[column]);
-                Edge edge = new Edge(node1, node2, (double)minDistance);
-                bool isContinue = true;
-                bool isNeedNewComponent = true;
-                foreach (List<Node> component in components)
+                else if (componentFirst == null && componentSecond != null)
                 {
-                    if (component.Contains(node1) && component.Contains(node2)) 
-                    {
-                        isContinue = false;  //Ребро не добавляется
-                    } 
-                    else if (component.Contains(node1) && !component.Contains(node2))
-                    {
-                        component.Add(node2);
-                        isNeedNewComponent = false;
-                    }
-                    else if (component.Contains(node2) && !component.Contains(node1))
-                    {
-                        component.Add(node1);
-                        isNeedNewComponent = false;
-                    }
+                    componentSecond.Nodes.Add(edge.FirstNode);
+                    resultGraph.AddEdge(edge);
+                }
+                else if (componentFirst != null && componentSecond == null)
+                {
+                    componentFirst.Nodes.Add(edge.SecondNode);
+                    resultGraph.AddEdge(edge);
+                }
+                else if (componentFirst != null && componentSecond != null) 
+                {
+                    components.Remove(componentFirst);
+                    components.Remove(componentSecond);
+                    components.Add(componentFirst + componentSecond);
+
+                    resultGraph.AddEdge(edge);
                 }
 
-                if (isContinue == false) continue;
-                if (isNeedNewComponent == true)
+                linkedGraph.RemoveEdge(edge);
+                if (components.Count == 1 && components[0].Nodes.Count == data.Count) 
                 {
-                    List<Node> list = new List<Node>();
-                    list.Add(node1);
-                    list.Add(node2);
-                    components.Add(list);
+                    isContinue = false;
                 }
-
-                //Добавление нового ребра
-                graph.AddEdge(edge);
-
-                //Исключение найденного значения из матрицы расстояний
-                distanceMatrix[row][column] = null;
-                distanceMatrix[column][row] = null;
             }
 
-            //Удаление ребер с наибольшими расстояниями
-
-
-
-            //Распределение данных по кластерам
-
-            return null;
-
-        }
-
-        public ClusterizationResult ExecuteClusterization(IList<double[]> data)
-        {
-            double?[][] distanceMatrix = new double?[data.Count][];
-            for (int i = 0; i < data.Count; i++)
+            int k = 0;
+            while (k != amountClusters - 1)
             {
-                for (int j = 0; j < data.Count; j++)
+                Edge maxEdge = null;
+                double maxWeight = double.MinValue;
+                foreach (Edge e in resultGraph.Edges)
                 {
-                    double? value = null;
-                    if (i != j)
-                        value = _measureSimilarity.Calculate(data[i], data[j]);
-
-                    distanceMatrix[i][j] = value;
+                    if (maxWeight < e.Weight)
+                    {
+                        maxEdge = e;
+                        maxWeight = e.Weight;
+                    }
                 }
+                resultGraph.RemoveEdge(maxEdge);
+                k++;
             }
 
-            Graph graph = new Graph();
-            List<List<Node>> components = null;
+            return resultGraph;
 
-            //while (/*Все узлы входят в один компонент*/)
-            //{
-            //    //Поиск наименьшего расстояния
-            //    double? minDistance = double.MaxValue;
-            //    int[] minDistanceIndexes = new int[2];
-
-            //    for (int i = 0; i < distanceMatrix.GetLength(0); i++)
-            //    {
-            //        for (int j = 0; j < distanceMatrix.GetLength(1); j++)
-            //        {
-            //            if (distanceMatrix[i][j] < minDistance)
-            //            { 
-            //                minDistance = distanceMatrix[i][j];
-            //                minDistanceIndexes[0] = i;
-            //                minDistanceIndexes[1] = j;
-            //            }
-            //        }
-            //    }
-
-            //    //Проверка на содержание ребра в том же компоненте
-            //    Node node1 = new Node(minDistanceIndexes[0]);
-            //    Node node2 = new Node(minDistanceIndexes[1]);
-            //    Edge edge = new Edge(new Node(minDistanceIndexes[0]), new Node(minDistanceIndexes[1]), (double)minDistance);
-            //    bool isContinue = true;
-            //    bool isNeedNewComponent = true;
-            //    foreach(List<Node> component in components)
-            //    {
-            //        if (component.Contains(node1) && component.Contains(node2)) isContinue = false;  //Ребро не добавляется
-            //        else if (component.Contains(node1) && !component.Contains(node2))
-            //        {
-            //            component.Add(node2);
-            //            isNeedNewComponent = false;
-            //        }
-            //        else if (component.Contains(node2) && !component.Contains(node1))
-            //        {
-            //            component.Add(node1);
-            //            isNeedNewComponent = false;
-            //        }
-            //    }
-            //    if (isContinue == false) continue;
-            //    if (isNeedNewComponent == true)
-            //    {
-            //        List<Node> list = new List<Node>();
-            //        list.Add(node1);
-            //        list.Add(node2);
-            //        components.Add(list);
-            //    }
-
-
-            //    //Добавление нового ребра
-            //    graph.AddEdge(edge);
-
-            //    //Исключение найденного значения из матрицы расстояний
-            //    distanceMatrix[minDistanceIndexes[0]][minDistanceIndexes[1]] = null;
-            //    distanceMatrix[minDistanceIndexes[1]][minDistanceIndexes[0]] = null;
-
-            //}
-
-            //Удаление ребер с наибольшими расстояними
-
-            //Распределение данных по кластерам
-
-
-            return null;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    interface IClusterableData
+    interface IClusterableResult
     {
         IList<double[]> GetClusterData();
     }

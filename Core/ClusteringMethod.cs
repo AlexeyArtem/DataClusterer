@@ -26,7 +26,7 @@ namespace DataClusterer
 
         }
 
-        public abstract ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters);
+        public abstract IClusterableResult ExecuteClusterization(IList<double[]> data, int amountClusters);
 
     }
 }

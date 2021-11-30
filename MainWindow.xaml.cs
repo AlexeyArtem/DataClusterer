@@ -27,7 +27,9 @@ namespace DataClusterer
         KMeans,
         KMeansPlusPlus,
         CMeans,
-        PrimaAlgorithm
+        PrimaAlgorithm,
+        KraskalaAlgorithm,
+        ForelMethod
     }
 
     enum TypeMeasure 
@@ -120,7 +122,7 @@ namespace DataClusterer
             return series;
         }
 
-        private SeriesCollection FillSeriesCollection(Graph clustersGraph) 
+        private SeriesCollection FillSeriesCollection(GraphClusters clustersGraph) 
         {
             SeriesCollection series = new SeriesCollection();
             Brush brushPoint = Brushes.Azure;
@@ -196,6 +198,12 @@ namespace DataClusterer
                 case TypeMethod.PrimaAlgorithm:
                     clusteringMethod = new PrimaAlgorithm(measureSimilarity);
                     break;
+                case TypeMethod.KraskalaAlgorithm:
+                    clusteringMethod = new KraskalaAlgorithm(measureSimilarity);
+                    break;
+                case TypeMethod.ForelMethod:
+                    clusteringMethod = new ForelMethod(measureSimilarity);
+                    break;
                 default:
                     clusteringMethod = new KMeans(measureSimilarity);
                     break;
@@ -221,23 +229,16 @@ namespace DataClusterer
             ClusteringMethod clusteringMethod = GetClusteringMethod();
             var result = clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2), (int)udAmountClusters.Value);
 
-            List<double[]> data = new List<double[]>()
+            if (result is GraphClusters graphClusters)
             {
-                new double[] {1, 1},
-                new double[] {1, 3},
-                new double[] {3, 1},
-                new double[] {5, 6},
-                new double[] {5, 8},
-                new double[] {7, 8},
-                new double[] {8, 2},
-                new double[] {8, 4},
-                new double[] {10, 2}
-            };
-
-            //var result = clusteringMethod.ExecuteClusterization(data, 3);
-
-            if (result.Clusters == null) chart.Series = FillSeriesCollection(result.ClustersGraph);
-            else chart.Series = FillSeriesCollection(result.Clusters);
+                chart.Series = FillSeriesCollection(graphClusters);
+                chart.LegendLocation = LegendLocation.None;
+            }
+            else if (result is VectorClusters vectorClusters) 
+            {
+                chart.Series = FillSeriesCollection(vectorClusters.Data);
+                chart.LegendLocation = LegendLocation.Bottom;
+            }
         }
 
         private void btRefreshColor_Click(object sender, RoutedEventArgs e)
@@ -267,8 +268,8 @@ namespace DataClusterer
                 MessageBox.Show("Выполнить автоматическую кластеризацию можно только с помощью векторных методов", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            var result = clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2));
-            chart.Series = FillSeriesCollection(result.Clusters);
+            var result = clusteringMethod.ExecuteClusterization(DataConverter.ReduceDemension(_data.ToArray(), 2)) as VectorClusters;
+            chart.Series = FillSeriesCollection(result.Data);
         }
     }
 }

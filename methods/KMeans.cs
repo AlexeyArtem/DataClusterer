@@ -38,21 +38,21 @@ namespace DataClusterer
         }
 
 
-        public virtual ClusterizationResult ExecuteClusterization(IList<double[]> data) 
+        public virtual IClusterableResult ExecuteClusterization(IList<double[]> data) 
         {
             if (data.Count <= 1) throw new ArgumentException();
 
             double accuracy = 1;
             int amountClusters = 1;
 
-            ClusterizationResult clusterizationResult = ExecuteClusterization(data, amountClusters); ;
+            VectorClusters clusterizationResult = ExecuteClusterization(data, amountClusters) as VectorClusters; ;
             
             double previousSum = int.MaxValue;
             double temp = previousSum;
             double currentSum = 0;
-            foreach (var centroid in clusterizationResult.Clusters.Keys)
+            foreach (var centroid in clusterizationResult.Data.Keys)
             {
-                foreach (var vector in clusterizationResult.Clusters[centroid])
+                foreach (var vector in clusterizationResult.Data[centroid])
                 {
                     currentSum += Math.Pow(_measureSimilarity.Calculate(vector, centroid), 2);
                 }
@@ -63,10 +63,10 @@ namespace DataClusterer
                 amountClusters++;
                 previousSum = currentSum; 
                 currentSum = 0;
-                clusterizationResult = ExecuteClusterization(data, amountClusters);
-                foreach(var centroid in clusterizationResult.Clusters.Keys)
+                clusterizationResult = ExecuteClusterization(data, amountClusters) as VectorClusters;
+                foreach(var centroid in clusterizationResult.Data.Keys)
                 {
-                    foreach (var vector in clusterizationResult.Clusters[centroid])
+                    foreach (var vector in clusterizationResult.Data[centroid])
                     {
                         currentSum += Math.Pow(_measureSimilarity.Calculate(vector, centroid), 2);
                     }
@@ -77,7 +77,7 @@ namespace DataClusterer
         }
 
 
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
+        public override IClusterableResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
             CheckData(data, amountClusters);
             InitializeCentroids(data, amountClusters);
@@ -112,7 +112,7 @@ namespace DataClusterer
                     newClusters.Add(_measureSimilarity.FindCentroid(_clusters[centroid], averageCentroid), _clusters[centroid]);
                 }
 
-                //3. Сравнение текущих и новых центров масс
+                //3. Сравнение текущих и новых центроидов
                 List<double[]> currentCentroids = _clusters.Keys.ToList();
                 List<double[]> newCentroids = newClusters.Keys.ToList();
                 isCentroidsChange = false;
@@ -133,7 +133,7 @@ namespace DataClusterer
                 }
             }
 
-            return new ClusterizationResult(_clusters);
+            return new VectorClusters(_clusters);
         }
     }
 }

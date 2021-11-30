@@ -16,8 +16,8 @@ namespace DataClusterer
             Weight = weight;
         }
 
-        public Node FirstNode { get; set; }
-        public Node SecondNode { get; set; }
+        public Node FirstNode { get; }
+        public Node SecondNode { get; }
         public double Weight { get; }
 
         public int CompareTo(object obj)

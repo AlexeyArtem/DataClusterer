@@ -45,7 +45,7 @@ namespace DataClusterer
             return matrixU;
         }
 
-        public override ClusterizationResult ExecuteClusterization(IList<double[]> data, int amountClusters)
+        public override IClusterableResult ExecuteClusterization(IList<double[]> data, int amountClusters)
         {
             CheckData(data, amountClusters);
             InitializeCentroids(data, amountClusters);
@@ -118,7 +118,7 @@ namespace DataClusterer
                 }
             }
 
-            return new ClusterizationResult(_clusters);
+            return new VectorClusters(_clusters);
         }
     }
 }

@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace DataClusterer
 {
-    class Graph
+    class GraphClusters : IClusterableResult
     {
         private List<Edge> edges;
         private List<Node> nodes;
 
-        public Graph()
+        public GraphClusters()
         {
             edges = new List<Edge>();
             nodes = new List<Node>();
         }
 
-        public IReadOnlyCollection<Edge> Edges { get => edges; }
-        public IReadOnlyCollection<Node> Nodes { get => nodes; }
+        public List<Edge> Edges { get => edges; }
+        public List<Node> Nodes { get => nodes; }
 
-        private void AddNode(Node node)
+        public void AddNode(Node node)
         {
             if (node == null) return;
 
@@ -35,6 +35,7 @@ namespace DataClusterer
         public void AddEdge(Edge edge) 
         {
             if (edge == null) return;
+            if (edge.FirstNode.Number == edge.SecondNode.Number) return;
 
             foreach (Edge e in edges)
             {
@@ -52,6 +53,16 @@ namespace DataClusterer
         {
             if (edge == null) return;
             edges.Remove(edge);
+        }
+
+        public IList<double[]> GetClusterData()
+        {
+            List<double[]> data = new List<double[]>();
+            foreach (var n in Nodes)
+            {
+                data.Add(n.Data);
+            }
+            return data;
         }
     }
 }
